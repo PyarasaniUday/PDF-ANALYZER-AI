@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = {
         dashboard: document.getElementById('dashboard-view'),
         quiz: document.getElementById('quiz-view'),
-        chat: document.getElementById('chat-view')
+        chat: document.getElementById('chat-view'),
+        extract: document.getElementById('extract-view')
     };
     
     const summaryContent = document.getElementById('summary-content');
@@ -522,4 +523,71 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { console.error("Status check failed", e); }
     }
     checkAiStatus();
+
+    // PDF Extraction Logic
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
+    if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', async () => {
+            if (!currentDocId) {
+                alert('Please select or upload a document first to extract insights.');
+                return;
+            }
+            
+            showLoading('Generating Document Report...');
+            
+            try {
+                const res = await fetch(`/document/${currentDocId}`);
+                if (!res.ok) throw new Error("Failed to fetch document details");
+                const doc = await res.json();
+                
+                const container = document.createElement('div');
+                container.style.padding = '2rem';
+                container.style.color = '#1e1e1e';
+                container.style.fontFamily = 'Arial, sans-serif';
+                container.style.lineHeight = '1.6';
+                
+                let html = `
+                    <div style="border-bottom: 2px solid #ef4444; padding-bottom: 1rem; margin-bottom: 2rem;">
+                        <h1 style="color: #ef4444; margin: 0;">Knowledge Report</h1>
+                        <h3 style="color: #666; margin-top: 0.5rem; font-weight: normal;">Document: ${doc.filename}</h3>
+                    </div>
+                    
+                    <h2 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 1.5rem;">Summary</h2>
+                    <p style="font-size: 1rem; color: #444;">${doc.summary}</p>
+                    
+                    <h2 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 1.5rem;">Global Key Terms</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem;">
+                        ${doc.keywords.map(k => `<span style="background: #fee2e2; color: #ef4444; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem; border: 1px solid #fecaca; display: inline-block;">${k}</span>`).join('')}
+                    </div>
+                    
+                    <h2 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 2rem;">Page-Wise Insights</h2>
+                `;
+                
+                doc.page_insights.forEach(insight => {
+                    html += `
+                        <div style="margin-top: 1rem; background: #f9fafb; padding: 1rem; border-left: 4px solid #ef4444; border-radius: 4px;">
+                            <strong style="color: #ef4444; font-size: 0.9rem; text-transform: uppercase;">Page ${insight.page}</strong>
+                            <div style="margin-top: 0.5rem; color: #444;">${insight.insight}</div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+                const opt = {
+                    margin: 0.5,
+                    filename: `Report_${doc.filename || 'Document'}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                
+                await html2pdf().set(opt).from(container).save();
+            } catch (err) {
+                alert('Error generating PDF: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        });
+    }
 });

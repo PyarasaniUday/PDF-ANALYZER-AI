@@ -364,7 +364,10 @@ def generate_quiz():
         return jsonify({"questions": formatted_questions[:num]})
     except Exception as e:
         print(f"Quiz Generation Error: {e}")
-        return jsonify({'error': f'Failed to generate quiz using AI: {str(e)}'}), 500
+        error_msg = str(e)
+        if "429" in error_msg or "Quota exceeded" in error_msg:
+            return jsonify({'error': 'AI Rate Limit Exceeded. Please wait a moment and try again, or check your API key quota.'}), 429
+        return jsonify({'error': f'Failed to generate quiz using AI: {error_msg}'}), 500
 
 @app.route('/chat', methods=['POST'])
 @login_required
@@ -414,6 +417,9 @@ def chat():
         return jsonify({'response': text})
     except Exception as e:
         print(f"Chat Error: {e}")
+        error_msg = str(e)
+        if "429" in error_msg or "Quota exceeded" in error_msg:
+            return jsonify({'response': 'AI Rate Limit Exceeded. Please wait a moment and try again.'})
         return jsonify({'response': "Error generating response from AI."})
 
 if __name__ == '__main__':

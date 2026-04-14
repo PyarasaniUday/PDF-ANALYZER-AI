@@ -58,6 +58,9 @@
                 <button class="nav-item" data-tab="chat">
                     <span class="icon">💬</span> Chat Assistant
                 </button>
+                <button class="nav-item" data-tab="extract">
+                    <span class="icon">⬇️</span> Export Notes
+                </button>
             </nav>
 
             <div class="sidebar-footer">
@@ -214,6 +217,18 @@
                             <button id="send-chat-btn" class="send-btn">➔</button>
                         </div>
                     </section>
+
+                </div>
+
+                <!-- Extract View -->
+                <div id="extract-view" class="view-section hidden">
+                    <section class="panel">
+                        <div class="panel-header">Export Insights</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Download a consolidated PDF report containing the summary, keywords, and page-wise insights of your document.</p>
+                        <button id="download-pdf-btn" class="btn-analyze" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span>📄</span> Extract as PDF
+                        </button>
+                    </section>
                 </div>
             </div>
         </main>
@@ -244,6 +259,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 
