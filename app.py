@@ -1,4 +1,8 @@
 import os
+import sys
+
+print(">>> STATING APP.PY", flush=True)
+
 import re
 import json
 import sqlite3
@@ -6,15 +10,22 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from PyPDF2 import PdfReader
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer
-import nltk
-from nltk.corpus import stopwords
-from collections import Counter
-import google.generativeai as genai
-from dotenv import load_dotenv, set_key
+
+print(">>> FLASK IMPORTED", flush=True)
+
+try:
+    from PyPDF2 import PdfReader
+    from sumy.parsers.plaintext import PlaintextParser
+    from sumy.nlp.tokenizers import Tokenizer
+    from sumy.summarizers.lsa import LsaSummarizer
+    import nltk
+    from nltk.corpus import stopwords
+    from collections import Counter
+    import google.generativeai as genai
+    from dotenv import load_dotenv, set_key
+    print(">>> ALL MODULES IMPORTED", flush=True)
+except Exception as e:
+    print(f">>> IMPORT ERROR: {e}", flush=True)
 
 # Load environment initially
 load_dotenv()
@@ -26,6 +37,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['DATABASE'] = 'database.db'
 app.config['ENV_FILE'] = '.env'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+print(">>> FLASK CONFIGURED", flush=True)
 
 # AI Configuration Global
 AI_MODEL = None
