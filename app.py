@@ -81,12 +81,13 @@ init_db()
 # Keyword extraction setup
 try:
     nltk.data.find('tokenizers/punkt')
+except:
+    pass
+
+try:
     nltk.data.find('corpora/stopwords')
-except (LookupError, AttributeError):
-    nltk.download('stopwords')
-    nltk.download('punkt')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('punkt_tab')
+except:
+    pass
 
 def summarize_text(text, sentences_count=3):
     if not text or len(text) < 20: return text
