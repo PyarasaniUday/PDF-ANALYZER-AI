@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF AI Pro Ultimate | Knowledge Base</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    
+    <!-- Auth Overlay -->
+    <div id="auth-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f5f5f5; z-index: 2000; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif;">
+        <div style="background: white; padding: 2.5rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px;">
+            <h2 id="auth-title" style="color: #ef4444; font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; text-align: left;">Login</h2>
+            
+            <form id="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="text" id="auth-username" placeholder="uday" required style="width: 100%; background: #eff6ff; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 0.95rem; color: #1e1e1e; outline: none; box-sizing: border-box;">
+                
+                <input type="password" id="auth-password" placeholder="........" required style="width: 100%; background: #eff6ff; padding: 0.8rem 1rem; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 0.95rem; color: #1e1e1e; outline: none; box-sizing: border-box;">
+                
+                <button type="submit" id="auth-submit-btn" style="width: 100%; background: #ef4444; color: white; border: none; padding: 0.8rem; border-radius: 4px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; font-size: 0.95rem;">Login</button>
+                
+                <div id="auth-error" style="color: #ef4444; font-size: 0.85rem; text-align: center;"></div>
+            </form>
+            
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: #ef4444; text-align: center;">
+                <span id="auth-toggle-text" style="color: #ef4444; opacity: 0.8;">Don't have an account?</span> 
+                <a href="#" id="auth-toggle-link" style="color: #ef4444; text-decoration: none;">Register</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🧠</span>
+                    <h2>PDF ANALYZER </h2>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span class="icon">🏠</span> Home Dashboard
+                </button>
+                <button class="nav-item" data-tab="quiz">
+                    <span class="icon">🎓</span> Study Quiz
+                </button>
+                <button class="nav-item" data-tab="chat">
+                    <span class="icon">💬</span> Chat Assistant
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="history-label">RECENT HISTORY</div>
+                <div id="history-list" class="history-list">
+                    <div class="no-history">No recent documents</div>
+                </div>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button id="settings-btn" class="settings-link hidden"><span class="icon">⚙️</span> AI Settings</button>
+                <div class="version">Ultimate Intelligence v3.5 (Offline)</div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Header -->
+            <header class="top-header">
+                <div id="header-title" class="current-task">Select a Document to Start</div>
+                <div class="header-actions">
+                    <div class="mode-toggles">
+                        <button id="mode-pdf" class="mode-btn active">PDF File</button>
+                        <button id="mode-text" class="mode-btn">Paste Text</button>
+                    </div>
+                    <div id="current-date" class="date-display"></div>
+                    <div class="user-profile-container" id="user-profile-btn" style="position: relative; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.4rem 0.8rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); transition: all 0.2s;">
+                        <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 0.9rem;">?</div>
+                        <div id="active-username" style="font-size: 0.9rem; font-weight: 500;">User</div>
+                        
+                        <div id="user-dropdown" class="hidden" style="position: absolute; top: 120%; right: 0; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; min-width: 140px; z-index: 100;">
+                            <button id="logout-btn" class="settings-link" style="width: 100%; padding: 0.5rem; color: #ef4444;"><span class="icon">🚪</span> Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content Area -->
+            <div class="content-scroll">
+                <!-- Dashboard View -->
+                <div id="dashboard-view" class="dashboard-grid">
+                    <!-- Top Section: Upload & Summary -->
+                    <div class="grid-row top-row">
+                        <!-- Document Source Panel -->
+                        <section class="panel document-source-panel">
+                            <div class="panel-header">Document Source</div>
+                            <div id="drop-zone" class="drop-zone">
+                                <div id="pdf-input-area" class="input-area">
+                                    <div class="upload-art">📄</div>
+                                    <p>Drop PDF or browse files</p>
+                                    <input type="file" id="file-input" hidden accept=".pdf">
+                                    <button class="btn-analyze" id="analyze-btn">Analyze Document</button>
+                                </div>
+                                <div id="text-input-area" class="input-area hidden">
+                                    <textarea id="paste-area"
+                                        placeholder="Paste your knowledge content here..."></textarea>
+                                    <button class="btn-analyze" id="analyze-text-btn">Analyze Text</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Quick Intelligence Panel -->
+                        <section class="panel intelligence-panel">
+                            <div class="panel-header">Quick Intelligence</div>
+                            <div id="summary-content" class="summary-content placeholder">
+                                Waiting for selection...
+                            </div>
+                            <div id="stats-content" class="stats-row hidden">
+                                <div class="stat-item"><span class="label">Pages:</span> <span id="stat-pages">0</span>
+                                </div>
+                                <div class="stat-item"><span class="label">Words:</span> <span id="stat-words">0</span>
+                                </div>
+                                <div class="stat-item"><span class="label">Read Time:</span> <span
+                                        id="stat-time">0m</span></div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Middle Section: Page Insights -->
+                    <section class="panel insights-panel full-width">
+                        <div class="panel-header">Page-Wise Insights <span class="header-sub">(Yellow = Key Term)</span>
+                        </div>
+                        <div id="insights-list" class="insights-list">
+                            <div class="big-placeholder">
+                                <h3>Select a Knowledge Source</h3>
+                                <p>Choose an item from the Sidebar History to view page-wise insights.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Bottom Section: Global Terms -->
+                    <section class="panel terms-panel full-width">
+                        <div class="panel-header">Key Terms</div>
+                        <div id="terms-cloud" class="terms-cloud">
+                            <!-- Terms will appear here -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Quiz View -->
+                <div id="quiz-view" class="view-section hidden">
+                    <section class="panel quiz-setup">
+                        <div class="panel-header">Quiz Configuration</div>
+                        <div class="quiz-controls">
+                            <div class="control-group">
+                                <label>Number of Questions :</label>
+                                <input type="range" id="quiz-count" min="1" max="20" value="5">
+                                <span id="quiz-count-val">5</span>
+                            </div>
+                            <button id="generate-quiz-btn" class="btn-analyze">Generate Neural Quiz</button>
+                        </div>
+                    </section>
+
+                    <section id="quiz-editor" class="panel quiz-editor hidden">
+                        <div class="panel-header">Refine Quiz <span class="header-sub">(Editable)</span></div>
+                        <div id="questions-list" class="questions-list"></div>
+                        <button id="start-quiz-btn" class="btn-analyze full-width">Initialize Test Mode</button>
+                    </section>
+
+                    <section id="quiz-player" class="panel quiz-player hidden">
+                        <div id="quiz-header" class="quiz-header">
+                            <span id="question-index">Question 1 of 5</span>
+                            <div id="timer" class="quiz-timer">--:--</div>
+                        </div>
+                        <div id="active-question-card" class="question-card"></div>
+                        <div class="quiz-footer">
+                            <button id="submit-ans-btn" class="btn-analyze">Submit Answer</button>
+                        </div>
+                    </section>
+
+                    <div id="quiz-results" class="results-overlay hidden">
+                        <div class="results-card glass-card">
+                            <h2>Quiz Complete</h2>
+                            <div class="score-circle">
+                                <span id="final-score">0</span>
+                                <span class="sub">%</span>
+                            </div>
+                            <p id="result-text">Well done! You've successfully traversed the document.</p>
+                            <button onclick="location.reload()" class="btn-analyze">Return to Base</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat View -->
+                <div id="chat-view" class="view-section hidden">
+                    <section class="panel chat-panel">
+                        <div class="panel-header">AI Neural Assistant</div>
+                        <div id="chat-thread" class="chat-thread">
+                            <div class="chat-bubble ai">Hello! I Have Analyzed your document. Ask me anything
+                                about it.</div>
+                        </div>
+                        <div class="chat-input-area">
+                            <textarea id="chat-input" placeholder="Query the AI... (Ctrl+Enter to send)"></textarea>
+                            <button id="send-chat-btn" class="send-btn">➔</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p id="loading-text">Extracting Neural Patterns...</p>
+        </div>
+    </div>
+
+    <!-- API Config Modal -->
+    <div id="settings-modal" class="results-overlay hidden">
+        <div class="glass-card settings-card">
+            <div class="panel-header">AI Configuration</div>
+            <p class="settings-hint">Enter your Google Gemini API Key to activate AI Chat and Quiz features.</p>
+            <div class="input-wrapper">
+                <input type="password" id="api-key-input" placeholder="Paste your API Key here...">
+                <div class="api-help">Don't have a key? <a href="https://aistudio.google.com/app/apikey"
+                        target="_blank">Get one here</a></div>
+            </div>
+            <div class="modal-actions">
+                <button id="close-settings" class="btn-secondary">Close</button>
+                <button id="save-api-btn" class="btn-analyze">Save & Activate</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
