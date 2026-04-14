@@ -423,5 +423,6 @@ def chat():
             return jsonify({'response': 'AI Rate Limit Exceeded. Please wait a moment and try again.'})
         return jsonify({'response': "Error generating response from AI."})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
